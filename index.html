@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Time Calc</title>
+<meta name="theme-color" content="#FFF1E6">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap">
+<style>
+:root{
+  --bg:#FFF1E6;--s:#4A2340;--i:#4A2340;--f:#FFFFFF;--b:#E6C9DA;--l:#FFE3EF;--dk:#4A2340;--btn:#F7A8CB;--bt:#3A1530;--neg:#B3204F;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--i);font-family:'VT323',ui-monospace,monospace;font-size:22px;line-height:1.15;-webkit-tap-highlight-color:transparent;min-height:100vh;min-height:100dvh;transition:background .2s}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+.ps{font-family:'Press Start 2P',ui-monospace,monospace;letter-spacing:0}
+.px{clip-path:polygon(0 8px,4px 8px,4px 4px,8px 4px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 4px,calc(100% - 4px) 4px,calc(100% - 4px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 4px) calc(100% - 8px),calc(100% - 4px) calc(100% - 4px),calc(100% - 8px) calc(100% - 4px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 4px),4px calc(100% - 4px),4px calc(100% - 8px),0 calc(100% - 8px))}
+.pxs{clip-path:polygon(0 6px,3px 6px,3px 3px,6px 3px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 3px,calc(100% - 3px) 3px,calc(100% - 3px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 3px) calc(100% - 6px),calc(100% - 3px) calc(100% - 3px),calc(100% - 6px) calc(100% - 3px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 3px),3px calc(100% - 3px),3px calc(100% - 6px),0 calc(100% - 6px))}
+.frame{background:var(--s);padding:4px}
+.frame.thin{padding:3px}
+.in{background:var(--f)}
+.in.white{background:#fff}
+.sh{filter:drop-shadow(5px 5px 0 var(--b))}
+.shd{filter:drop-shadow(5px 5px 0 var(--dk))}
+#deco{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+#deco svg{position:absolute;shape-rendering:crispEdges}
+@keyframes twinkle{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.6)}}
+.star{animation:twinkle 1.6s steps(3) infinite}
+.t1{animation-delay:.2s}.t2{animation-delay:.5s}.t3{animation-delay:.8s}.t4{animation-delay:1.1s}
+.cloud{opacity:.5}
+@media (prefers-reduced-motion:reduce){.star{animation:none}}
+#app{position:relative;z-index:1;max-width:440px;margin:0 auto;padding:calc(48px + env(safe-area-inset-top)) 18px calc(40px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:16px}
+.col{display:flex;flex-direction:column}
+.row{display:flex;align-items:center}
+.center{display:flex;justify-content:center}
+.g6{gap:6px}.g8{gap:8px}.g10{gap:10px}.g12{gap:12px}.g14{gap:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.muted{color:var(--s)}
+/* header dropdown */
+.hdr{position:relative;display:flex;justify-content:center;z-index:5}
+.dd{width:260px}
+.ddbtn{width:100%;height:52px;border:0;background:var(--f);color:var(--i);font-size:14px;display:flex;align-items:center;justify-content:center;gap:12px;padding:0 12px}
+.menu{position:absolute;top:62px;width:270px;filter:drop-shadow(5px 5px 0 var(--b))}
+.menu .in{display:flex;flex-direction:column;padding:6px}
+.mi{display:flex;align-items:center;gap:12px;height:48px;border:0;background:transparent;font-size:12px;color:var(--i);padding:0 10px;text-align:left}
+.mi.cur{background:var(--l)}
+.mi i{display:block;width:16px;height:16px;flex:none;box-shadow:inset 0 0 0 3px rgba(0,0,0,.35)}
+/* segmented */
+.seg{display:flex}
+.sg{height:44px;min-width:44px;border:3px solid var(--s);background:var(--f);color:var(--i);font-size:11px;padding:0 10px}
+.sg+.sg{border-left:0}
+.sg.on{background:var(--s);color:#fff}
+.sg.big{font-size:16px;padding:0}
+/* inputs */
+.fld{background:var(--b);padding:3px;flex:0 1 54px;min-width:42px}
+.fld input{display:block;width:100%;height:38px;border:0;background:var(--f);text-align:center;font-size:28px;color:var(--i);padding:0;outline:none}
+.fld input:focus{background:#fff}
+.fld.wide{flex:0 1 92px}
+.u{font-size:22px}
+.lbl{font-size:10px;color:var(--s)}
+.xbtn{width:36px;height:44px;border:0;background:transparent;color:var(--s);font-size:12px;padding:0;flex:none}
+.rows{display:flex;flex-direction:column;gap:10px}
+.rowin{padding:8px 8px;display:flex;align-items:center;gap:6px}
+.addrow{width:100%;height:50px;border:0;background:var(--l);color:var(--s);font-size:12px}
+.bigbtn{width:100%;height:66px;border:0;background:var(--btn);color:var(--bt);font-size:16px}
+.bigbtn:disabled{opacity:.6}
+.screen{padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.big{font-size:32px;line-height:1.2;white-space:nowrap}
+.sub{font-size:20px;color:var(--s)}
+.neg{color:var(--neg)}
+.tag{display:inline-block;background:var(--l);color:var(--i);font-size:9px;padding:6px 8px}
+.sticky{position:sticky;top:8px;z-index:3}
+.chip{background:var(--l);padding:8px;font-size:11px;color:var(--i)}
+/* timer */
+.tapb{width:122px;height:56px;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:0;background:var(--l);color:var(--i)}
+.tapb.done{background:var(--s);color:#fff}
+.tapb .hint{font-family:'VT323',monospace;font-size:17px;color:var(--s)}
+.tapb.done .hint{color:var(--bg)}
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.cal .wd{font-size:9px;text-align:center;color:var(--s);padding-bottom:4px}
+.day{height:42px;border:0;background:transparent;color:var(--i);font-size:22px;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.day.flown{background:var(--l)}
+.day.sel{background:var(--s);color:#fff}
+.day.today{box-shadow:inset 0 0 0 3px var(--b)}
+.day svg{width:10px;height:10px}
+/* todo */
+.cb{width:34px;height:34px;border:0;background:#fff;display:flex;align-items:center;justify-content:center;padding:0}
+.cb.on{background:var(--l)}
+.done-t{text-decoration:line-through;color:var(--s)}
+.duebtn{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;flex:none}
+.duebtn input{position:absolute;inset:0;opacity:0;width:100%;height:100%;border:0;padding:0;cursor:pointer}
+.tag.over{background:var(--s);color:#fff}
+/* modal + toast */
+#modal{position:fixed;inset:0;background:rgba(40,20,40,.35);z-index:20;display:flex;align-items:center;justify-content:center;padding:18px}
+#modal[hidden]{display:none}
+#modal .box{width:100%;max-width:400px;max-height:90vh;overflow:auto}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:30;pointer-events:none;transition:opacity .2s}
+#toast[hidden]{display:none}
+.txt{width:100%;height:46px;border:0;background:var(--f);padding:0 12px;font-size:24px;color:var(--i);outline:none}
+.list-sep{border-top:3px dashed var(--b)}
+.tile{display:block;text-decoration:none;color:inherit;border:0;padding:0;background:transparent;width:100%;text-align:center}
+.small{font-size:18px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="deco"></div>
+<main id="app"></main>
+<div id="modal" hidden></div>
+<div id="toast" hidden></div>
+<input type="file" id="restoreFile" accept=".json,application/json" hidden>
+<script>
+(function(){
+'use strict';
+/* ---------------- themes & pages ---------------- */
+const THEMES={
+  home:  {bg:'#FFF1E6',s:'#4A2340',i:'#4A2340',f:'#FFFFFF',b:'#E6C9DA',l:'#FFE3EF',dk:'#4A2340',btn:'#F7A8CB',bt:'#3A1530',neg:'#B3204F',stars:['#F7A8CB','#C9B6FF','#8ED9BC','#A9D6FA','#FFB394']},
+  pink:  {bg:'#FFD6E8',s:'#8A2A5B',i:'#6E1F47',f:'#FFF6EC',b:'#E58BB5',l:'#FFE9F2',dk:'#6E1F47',btn:'#F7A8CB',bt:'#4A1230',neg:'#5B2A8A',stars:['#FFFFFF','#C9B6FF','#B8F0D8']},
+  blue:  {bg:'#D3ECFF',s:'#2A5D8A',i:'#17405F',f:'#F4FAFF',b:'#8CC3EE',l:'#E8F5FF',dk:'#17405F',btn:'#A9D6FA',bt:'#0E2C44',neg:'#B3204F',stars:['#FFFFFF','#FFC2E0','#C9B6FF']},
+  peach: {bg:'#FFE3D3',s:'#9A4A2A',i:'#6A2E16',f:'#FFF8F2',b:'#F2A98A',l:'#FFC9AE',dk:'#6A2E16',btn:'#FFB394',bt:'#4A1C0A',neg:'#B3204F',stars:['#FFFFFF','#FFC2E0','#C9B6FF']},
+  mint:  {bg:'#D2F5E6',s:'#2A7A5E',i:'#164D3A',f:'#F3FFF9',b:'#8ED9BC',l:'#E6FBF2',dk:'#164D3A',btn:'#9FE3C6',bt:'#0C3324',neg:'#B3204F',stars:['#FFFFFF','#FFC2E0','#C9B6FF']},
+  peri:  {bg:'#DCE0FF',s:'#3F4A9A',i:'#262E6B',f:'#F7F8FF',b:'#A9B0F0',l:'#C7CCFF',dk:'#262E6B',btn:'#C7CCFF',bt:'#161C4A',neg:'#B3204F',stars:['#FFFFFF','#FFC2E0','#B8F0D8']},
+  butter:{bg:'#FFF4C2',s:'#8A6A12',i:'#5A4508',f:'#FFFBEA',b:'#E8CF6E',l:'#FFE68A',dk:'#5A4508',btn:'#FFE68A',bt:'#3D2E04',neg:'#B3204F',stars:['#FFFFFF','#FFC2E0','#C9B6FF']},
+  purple:{bg:'#E2D4FF',s:'#5B2A8A',i:'#3E1A63',f:'#FBF6FF',b:'#B08BE5',l:'#CDB4FF',dk:'#3E1A63',btn:'#CDB4FF',bt:'#2A0F45',neg:'#B3204F',stars:['#FFFFFF','#FFC2E0','#B8F0D8']}
+};
+const PAGES=[
+  {id:'home',label:'HOME',theme:'home'},
+  {id:'calc',label:'TIME CALC',theme:'pink'},
+  {id:'clock',label:'CLOCK CALC',theme:'blue'},
+  {id:'timer',label:'FLIGHT TIMER',theme:'peach'},
+  {id:'sdt',label:'SDT CALC',theme:'mint'},
+  {id:'diary',label:'FLIGHT DIARY',theme:'peri'},
+  {id:'todo',label:'TO-DO',theme:'butter'},
+  {id:'zulu',label:'ZULU TIME',theme:'purple'}
+];
+/* IATA code -> [city, IANA time zone] */
+const IATA={
+MNL:['Manila','Asia/Manila'],CEB:['Cebu','Asia/Manila'],DVO:['Davao','Asia/Manila'],CRK:['Clark','Asia/Manila'],ILO:['Iloilo','Asia/Manila'],BCD:['Bacolod','Asia/Manila'],PPS:['Puerto Princesa','Asia/Manila'],KLO:['Kalibo','Asia/Manila'],TAG:['Bohol-Panglao','Asia/Manila'],ZAM:['Zamboanga','Asia/Manila'],LAO:['Laoag','Asia/Manila'],GES:['General Santos','Asia/Manila'],CGY:['Cagayan de Oro','Asia/Manila'],TAC:['Tacloban','Asia/Manila'],BXU:['Butuan','Asia/Manila'],DGT:['Dumaguete','Asia/Manila'],ENI:['El Nido','Asia/Manila'],USU:['Busuanga','Asia/Manila'],MPH:['Caticlan','Asia/Manila'],SFS:['Subic Bay','Asia/Manila'],DRP:['Bicol','Asia/Manila'],TUG:['Tuguegarao','Asia/Manila'],OZC:['Ozamiz','Asia/Manila'],PAG:['Pagadian','Asia/Manila'],RXS:['Roxas','Asia/Manila'],CYZ:['Cauayan','Asia/Manila'],SJI:['San Jose','Asia/Manila'],DPL:['Dipolog','Asia/Manila'],IAO:['Siargao','Asia/Manila'],SUG:['Surigao','Asia/Manila'],MBT:['Masbate','Asia/Manila'],BSO:['Basco','Asia/Manila'],WNP:['Naga','Asia/Manila'],VRC:['Virac','Asia/Manila'],CBO:['Cotabato','Asia/Manila'],CYP:['Calbayog','Asia/Manila'],
+HKG:['Hong Kong','Asia/Hong_Kong'],MFM:['Macau','Asia/Macau'],TPE:['Taipei','Asia/Taipei'],TSA:['Taipei Songshan','Asia/Taipei'],KHH:['Kaohsiung','Asia/Taipei'],
+NRT:['Tokyo Narita','Asia/Tokyo'],HND:['Tokyo Haneda','Asia/Tokyo'],KIX:['Osaka Kansai','Asia/Tokyo'],ITM:['Osaka Itami','Asia/Tokyo'],NGO:['Nagoya','Asia/Tokyo'],FUK:['Fukuoka','Asia/Tokyo'],CTS:['Sapporo','Asia/Tokyo'],OKA:['Okinawa','Asia/Tokyo'],
+ICN:['Seoul Incheon','Asia/Seoul'],GMP:['Seoul Gimpo','Asia/Seoul'],PUS:['Busan','Asia/Seoul'],CJU:['Jeju','Asia/Seoul'],
+PEK:['Beijing','Asia/Shanghai'],PKX:['Beijing Daxing','Asia/Shanghai'],PVG:['Shanghai Pudong','Asia/Shanghai'],SHA:['Shanghai Hongqiao','Asia/Shanghai'],CAN:['Guangzhou','Asia/Shanghai'],SZX:['Shenzhen','Asia/Shanghai'],CTU:['Chengdu','Asia/Shanghai'],XMN:['Xiamen','Asia/Shanghai'],
+SIN:['Singapore','Asia/Singapore'],KUL:['Kuala Lumpur','Asia/Kuala_Lumpur'],PEN:['Penang','Asia/Kuala_Lumpur'],BKI:['Kota Kinabalu','Asia/Kuching'],KCH:['Kuching','Asia/Kuching'],BWN:['Brunei','Asia/Brunei'],
+BKK:['Bangkok','Asia/Bangkok'],DMK:['Bangkok Don Mueang','Asia/Bangkok'],HKT:['Phuket','Asia/Bangkok'],CNX:['Chiang Mai','Asia/Bangkok'],
+SGN:['Ho Chi Minh City','Asia/Ho_Chi_Minh'],HAN:['Hanoi','Asia/Ho_Chi_Minh'],DAD:['Da Nang','Asia/Ho_Chi_Minh'],PNH:['Phnom Penh','Asia/Phnom_Penh'],REP:['Siem Reap','Asia/Phnom_Penh'],VTE:['Vientiane','Asia/Vientiane'],RGN:['Yangon','Asia/Yangon'],
+CGK:['Jakarta','Asia/Jakarta'],SUB:['Surabaya','Asia/Jakarta'],DPS:['Bali','Asia/Makassar'],
+DEL:['Delhi','Asia/Kolkata'],BOM:['Mumbai','Asia/Kolkata'],BLR:['Bengaluru','Asia/Kolkata'],MAA:['Chennai','Asia/Kolkata'],CMB:['Colombo','Asia/Colombo'],MLE:['Male','Indian/Maldives'],KTM:['Kathmandu','Asia/Kathmandu'],DAC:['Dhaka','Asia/Dhaka'],KHI:['Karachi','Asia/Karachi'],
+DXB:['Dubai','Asia/Dubai'],AUH:['Abu Dhabi','Asia/Dubai'],DOH:['Doha','Asia/Qatar'],BAH:['Bahrain','Asia/Bahrain'],KWI:['Kuwait','Asia/Kuwait'],RUH:['Riyadh','Asia/Riyadh'],JED:['Jeddah','Asia/Riyadh'],MCT:['Muscat','Asia/Muscat'],TLV:['Tel Aviv','Asia/Jerusalem'],IST:['Istanbul','Europe/Istanbul'],
+SYD:['Sydney','Australia/Sydney'],MEL:['Melbourne','Australia/Melbourne'],BNE:['Brisbane','Australia/Brisbane'],PER:['Perth','Australia/Perth'],ADL:['Adelaide','Australia/Adelaide'],DRW:['Darwin','Australia/Darwin'],CNS:['Cairns','Australia/Brisbane'],
+AKL:['Auckland','Pacific/Auckland'],CHC:['Christchurch','Pacific/Auckland'],WLG:['Wellington','Pacific/Auckland'],NAN:['Nadi','Pacific/Fiji'],GUM:['Guam','Pacific/Guam'],SPN:['Saipan','Pacific/Saipan'],ROR:['Palau','Pacific/Palau'],POM:['Port Moresby','Pacific/Port_Moresby'],HNL:['Honolulu','Pacific/Honolulu'],
+LHR:['London Heathrow','Europe/London'],LGW:['London Gatwick','Europe/London'],MAN:['Manchester','Europe/London'],EDI:['Edinburgh','Europe/London'],DUB:['Dublin','Europe/Dublin'],CDG:['Paris CDG','Europe/Paris'],ORY:['Paris Orly','Europe/Paris'],AMS:['Amsterdam','Europe/Amsterdam'],FRA:['Frankfurt','Europe/Berlin'],MUC:['Munich','Europe/Berlin'],BER:['Berlin','Europe/Berlin'],ZRH:['Zurich','Europe/Zurich'],GVA:['Geneva','Europe/Zurich'],VIE:['Vienna','Europe/Vienna'],BRU:['Brussels','Europe/Brussels'],CPH:['Copenhagen','Europe/Copenhagen'],ARN:['Stockholm','Europe/Stockholm'],OSL:['Oslo','Europe/Oslo'],HEL:['Helsinki','Europe/Helsinki'],MAD:['Madrid','Europe/Madrid'],BCN:['Barcelona','Europe/Madrid'],LIS:['Lisbon','Europe/Lisbon'],FCO:['Rome','Europe/Rome'],MXP:['Milan','Europe/Rome'],ATH:['Athens','Europe/Athens'],PRG:['Prague','Europe/Prague'],WAW:['Warsaw','Europe/Warsaw'],BUD:['Budapest','Europe/Budapest'],KEF:['Reykjavik','Atlantic/Reykjavik'],
+JFK:['New York JFK','America/New_York'],LGA:['New York LaGuardia','America/New_York'],EWR:['Newark','America/New_York'],BOS:['Boston','America/New_York'],IAD:['Washington Dulles','America/New_York'],DCA:['Washington National','America/New_York'],ATL:['Atlanta','America/New_York'],MIA:['Miami','America/New_York'],MCO:['Orlando','America/New_York'],ORD:['Chicago','America/Chicago'],DFW:['Dallas','America/Chicago'],IAH:['Houston','America/Chicago'],DEN:['Denver','America/Denver'],PHX:['Phoenix','America/Phoenix'],LAS:['Las Vegas','America/Los_Angeles'],LAX:['Los Angeles','America/Los_Angeles'],SFO:['San Francisco','America/Los_Angeles'],SEA:['Seattle','America/Los_Angeles'],SAN:['San Diego','America/Los_Angeles'],ANC:['Anchorage','America/Anchorage'],
+YYZ:['Toronto','America/Toronto'],YVR:['Vancouver','America/Vancouver'],YUL:['Montreal','America/Toronto'],MEX:['Mexico City','America/Mexico_City'],CUN:['Cancun','America/Cancun'],PTY:['Panama City','America/Panama'],BOG:['Bogota','America/Bogota'],LIM:['Lima','America/Lima'],SCL:['Santiago','America/Santiago'],EZE:['Buenos Aires','America/Argentina/Buenos_Aires'],GRU:['Sao Paulo','America/Sao_Paulo'],GIG:['Rio de Janeiro','America/Sao_Paulo'],
+JNB:['Johannesburg','Africa/Johannesburg'],CPT:['Cape Town','Africa/Johannesburg'],CAI:['Cairo','Africa/Cairo'],NBO:['Nairobi','Africa/Nairobi'],ADD:['Addis Ababa','Africa/Addis_Ababa'],LOS:['Lagos','Africa/Lagos'],CMN:['Casablanca','Africa/Casablanca']
+};
+
+/* ---------------- state ---------------- */
+const KEY='timecalc-v1';
+const newRow=()=>({s:1,h:'',m:''});
+function defaults(){
+  return {
+    v:1, fmt24:true,
+    calc:{rows:[newRow()]},
+    clock:{zulu:true,sh:'',sm:'',rows:[newRow()]},
+    timer:{zulu:true,ev:{out:null,off:null,on:null,in:null},savedId:null},
+    sdt:{solve:'time',gs:'',dist:'',th:'',tm:''},
+    diary:{flights:[],month:null,sel:null},
+    todo:{items:[]},
+    zones:['MNL'],
+    lastBackup:null
+  };
+}
+function merge(d,o){
+  if(!o||typeof o!=='object'||Array.isArray(o))return d;
+  for(const k in d){
+    if(!(k in o))continue;
+    if(d[k]&&typeof d[k]==='object'&&!Array.isArray(d[k]))d[k]=merge(d[k],o[k]);
+    else d[k]=o[k];
+  }
+  return d;
+}
+let S;
+try{S=merge(defaults(),JSON.parse(localStorage.getItem(KEY)||'null'));}catch(e){S=defaults();}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+
+/* ---------------- helpers ---------------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad2=n=>String(n).padStart(2,'0');
+const MINUS='−';
+const num=v=>{if(v===''||v==null)return 0;const n=Number(v);return isFinite(n)?n:0;};
+function fmtDur(min){
+  const neg=min<0;min=Math.abs(Math.round(min));
+  return (neg?MINUS:'')+Math.floor(min/60)+'h '+pad2(min%60)+'m';
+}
+function fmtHM(h,m){
+  if(S.fmt24)return pad2(h)+':'+pad2(m);
+  return (((h+11)%12)+1)+':'+pad2(m)+' '+(h<12?'AM':'PM');
+}
+const LOCAL_TZ=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone;}catch(e){return undefined;}})();
+function partsIn(date,tz){
+  const f=new Intl.DateTimeFormat('en-GB',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23',weekday:'short'});
+  const o={};for(const p of f.formatToParts(date))o[p.type]=p.value;
+  return {y:+o.year,mo:+o.month,d:+o.day,h:+o.hour%24,m:+o.minute,wd:o.weekday};
+}
+const MONTHS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const MONTHS_LONG=['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+function dateLabel(p){return p.wd.toUpperCase()+' '+pad2(p.d)+' '+MONTHS[p.mo-1]+' '+p.y;}
+function offsetMin(date,tz){
+  const p=partsIn(date,tz);
+  const asUTC=Date.UTC(p.y,p.mo-1,p.d,p.h,p.m);
+  return Math.round((asUTC-Math.floor(date.getTime()/60000)*60000)/60000);
+}
+function fmtOffset(min){
+  const sign=min<0?MINUS:'+';min=Math.abs(min);
+  return 'UTC'+sign+Math.floor(min/60)+(min%60?':'+pad2(min%60):'');
+}
+function ymd(y,mo,d){return y+'-'+pad2(mo)+'-'+pad2(d);}
+function localYMD(date){return ymd(date.getFullYear(),date.getMonth()+1,date.getDate());}
+function parseYMD(s){const [y,m,d]=s.split('-').map(Number);return {y,m,d};}
+function wdOf(s){const {y,m,d}=parseYMD(s);return ['SUN','MON','TUE','WED','THU','FRI','SAT'][new Date(y,m-1,d).getDay()];}
+function hmToMin(s){if(!s)return null;const m=/^(\d{1,2}):?(\d{2})$/.exec(String(s).trim());if(!m)return null;const h=+m[1],mi=+m[2];if(h>23||mi>59)return null;return h*60+mi;}
+function minToHM(min){return pad2(Math.floor(min/60))+':'+pad2(min%60);}
+const digits=v=>v.replace(/[^\d]/g,'');
+const decimal=v=>{v=v.replace(/,/g,'.').replace(/[^\d.]/g,'');const i=v.indexOf('.');return i<0?v:v.slice(0,i+1)+v.slice(i+1).replace(/\./g,'');};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+/* ---------------- pixel art ---------------- */
+function rect(x,y,c,w=1,h=1){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+c+'"/>';}
+function sparkle(c){return rect(3,0,c,1,7)+rect(0,3,c,7,1)+rect(2,2,c,3,3);}
+const CLOUD=[[0,4,7],[1,2,12],[2,1,13],[3,0,15],[4,0,15],[5,1,14]].map(([y,a,b])=>rect(a,y,'#FFFFFF',b-a+1,1)).join('');
+function gridSvg(rows,color,px){
+  const h=rows.length,w=Math.max(...rows.map(r=>r.length));let r='';
+  rows.forEach((row,y)=>[...row].forEach((ch,x)=>{if(ch==='#')r+=rect(x,y,color);}));
+  return '<svg style="width:'+w*px+'px;height:'+h*px+'px;shape-rendering:crispEdges" viewBox="0 0 '+w+' '+h+'" aria-hidden="true">'+r+'</svg>';
+}
+function line(x0,y0,x1,y1){
+  const pts=[];const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let e=dx+dy;
+  for(let n=0;n<64;n++){pts.push([x0,y0]);if(x0===x1&&y0===y1)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx;}if(e2<=dx){e+=dx;y0+=sy;}}
+  return pts;
+}
+function clockSvg(h,m,size,c){
+  c=c||{ring:'#2A5D8A',face:'#FFFFFF',tick:'#8CC3EE',min:'#17405F',hr:'#2A5D8A',dot:'#F48FB8'};
+  let r='';
+  for(let y=0;y<21;y++)for(let x=0;x<21;x++){const d=Math.hypot(x-10,y-10);if(d<8.5)r+=rect(x,y,c.face);else if(d<9.6)r+=rect(x,y,c.ring);}
+  r+=rect(10,2,c.tick)+rect(18,10,c.tick)+rect(10,18,c.tick)+rect(2,10,c.tick);
+  if(h!=null){
+    const am=m*6*Math.PI/180,ah=((h%12)+m/60)*30*Math.PI/180;
+    line(10,10,Math.round(10+7.2*Math.sin(am)),Math.round(10-7.2*Math.cos(am))).forEach(([x,y])=>r+=rect(x,y,c.min));
+    line(10,10,Math.round(10+4.6*Math.sin(ah)),Math.round(10-4.6*Math.cos(ah))).forEach(([x,y])=>r+=rect(x,y,c.hr));
+  }
+  r+=rect(10,10,c.dot)+rect(3,0,c.ring,3,2)+rect(15,0,c.ring,3,2);
+  return '<svg role="img" aria-label="Pixel clock" style="width:'+size+'px;height:'+size+'px;shape-rendering:crispEdges;display:block" viewBox="0 0 21 21">'+r+'</svg>';
+}
+const TICK=c=>'<svg style="width:16px;height:14px;shape-rendering:crispEdges" viewBox="0 0 7 6" aria-hidden="true">'+[[6,0],[5,1],[4,2],[3,3],[2,4],[1,3],[0,2]].map(([x,y])=>rect(x,y,c,1,2)).join('')+'</svg>';
+const CARET=c=>'<svg style="width:15px;height:9px;shape-rendering:crispEdges" viewBox="0 0 5 3" aria-hidden="true">'+rect(0,0,c,5)+rect(1,1,c,3)+rect(2,2,c)+'</svg>';
+const ICONS={
+  calc:['..#.......','..#.......','#####.....','..#.......','..#.......','..........','.....#####','..........'],
+  timer:['...###...','....#....','..#####..','.#.....#.','#...#...#','#...#...#','#....##.#','#.......#','.#.....#.','..#####..'],
+  sdt:['......#...','......##..','#########.','......##..','......#...'],
+  diary:['.#...#.','#######','#.....#','#######','#.#.#.#','#######','#.#.#.#','#######'],
+  todo:['#######','#.....#','#....##','#.#.#.#','#..#..#','#.....#','#######'],
+  zulu:['#######','.....#.','....#..','...#...','..#....','.#.....','#######']
+};
+const CAL_ICON=c=>'<span style="display:inline-flex;color:'+c+'">'+gridSvg(['#######','#.....#','#######','#.#.#.#','#######'],'currentColor',4)+'</span>';
+
+/* ---------------- deco ---------------- */
+const STAR_POS=[[3,2,21,''],[24,4,14,'t2'],[68,2,14,'t1'],[88,3,21,'t3'],[1,52,14,'t4'],[94,60,14,'t1'],[2,74,21,'t3'],[93,78,14,''],[9,93,14,'t2'],[48,95,14,'t4'],[86,92,21,'t1']];
+function renderDeco(t){
+  let h='';
+  [[3,84,128],[60,88,144],[30,92,96]].forEach(([l,top,w])=>{h+='<svg class="cloud" style="left:'+l+'%;top:'+top+'%;width:'+w+'px;height:'+(w*6/16)+'px" viewBox="0 0 16 6" aria-hidden="true">'+CLOUD+'</svg>';});
+  STAR_POS.forEach(([l,top,size,cls],n)=>{h+='<svg class="star '+cls+'" style="left:'+l+'%;top:'+top+'%;width:'+size+'px;height:'+size+'px" viewBox="0 0 7 7" aria-hidden="true">'+sparkle(t.stars[n%t.stars.length])+'</svg>';});
+  $('#deco').innerHTML=h;
+}
+function applyTheme(name){
+  const t=THEMES[name],r=document.documentElement.style;
+  for(const k of ['bg','s','i','f','b','l','dk','btn','neg'])r.setProperty('--'+k,t[k]);
+  r.setProperty('--bt',t.bt);
+  const meta=document.querySelector('meta[name=theme-color]');if(meta)meta.setAttribute('content',t.bg);
+  renderDeco(t);
+}
+
+/* ---------------- shared ui ---------------- */
+let menuOpen=false;
+function header(p){
+  const items=PAGES.map(q=>'<button type="button" class="mi ps'+(q.id===p.id?' cur':'')+'" data-act="go" data-p="'+q.id+'"><i style="background:'+THEMES[q.theme].bg+'"></i>'+q.label+'</button>').join('');
+  return '<div class="hdr"><div class="frame thin px dd"><button type="button" class="px ddbtn ps" data-act="menu" aria-haspopup="true" aria-expanded="'+menuOpen+'">'+p.label+CARET(THEMES[p.theme].i)+'</button></div>'+
+    '<div class="menu'+(menuOpen?'':' hidden')+'"><div class="frame px"><div class="in px">'+items+'</div></div></div></div>';
+}
+function seg(items,act){return '<div class="seg">'+items.map(([lab,val,on])=>'<button type="button" class="sg ps'+(on?' on':'')+'" aria-pressed="'+on+'" data-act="'+act+'" data-v="'+val+'">'+lab+'</button>').join('')+'</div>';}
+function fmtSeg(){return seg([['24H','24',S.fmt24],['12H','12',!S.fmt24]],'fmt');}
+function zoneSeg(z){return seg([['LOCAL','L',!z],['ZULU','Z',z]],'zmode');}
+function bigBtn(label,act,extra){return '<div class="shd"><div class="px" style="background:var(--dk);padding:4px"><button type="button" class="px bigbtn ps" data-act="'+act+'"'+(extra||'')+'>'+label+'</button></div></div>';}
+function rowsHtml(rows){
+  return rows.map((r,i)=>'<div class="frame thin px"><div class="in white px rowin">'+
+    '<div class="seg"><button type="button" class="sg big ps'+(r.s>0?' on':'')+'" aria-label="Add" aria-pressed="'+(r.s>0)+'" data-act="sign" data-i="'+i+'" data-v="1">+</button><button type="button" class="sg big ps'+(r.s<0?' on':'')+'" aria-label="Subtract" aria-pressed="'+(r.s<0)+'" data-act="sign" data-i="'+i+'" data-v="-1">'+MINUS+'</button></div>'+
+    '<div class="fld pxs" style="margin-left:4px"><input class="pxs" inputmode="numeric" autocomplete="off" placeholder="0" aria-label="Hours" data-in="rh" data-i="'+i+'" value="'+esc(r.h)+'"></div><span class="u">h</span>'+
+    '<div class="fld pxs"><input class="pxs" inputmode="numeric" autocomplete="off" placeholder="0" aria-label="Minutes" data-in="rm" data-i="'+i+'" value="'+esc(r.m)+'"></div><span class="u">m</span>'+
+    '<button type="button" class="xbtn ps" style="margin-left:auto" aria-label="Remove row" data-act="delrow" data-i="'+i+'">x</button></div></div>').join('')+
+    '<div class="frame thin px"><button type="button" class="px addrow ps" data-act="addrow">+ ADD ROW</button></div>';
+}
+const rowsTotal=rows=>rows.reduce((a,r)=>a+r.s*(num(r.h)*60+num(r.m)),0);
+function rowsExpr(rows,startLabel){
+  const used=rows.filter(r=>r.h!==''||r.m!=='');
+  if(!used.length)return startLabel||'add some time';
+  if(used.length>5)return (startLabel?startLabel+' ':'')+used.length+' rows';
+  let s=startLabel||'';
+  used.forEach((r,n)=>{const v=(num(r.h)+Math.floor(num(r.m)/60))+':'+pad2(num(r.m)%60);
+    if(!s&&n===0)s=(r.s<0?MINUS:'')+v;else s+=' '+(r.s<0?MINUS:'+')+' '+v;});
+  return s;
+}
+function toast(msg){const t=$('#toast');t.innerHTML='<div class="frame px"><div class="in px ps" style="padding:12px 16px;font-size:11px">'+esc(msg)+'</div></div>';t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,1800);}
+function openModal(html){const m=$('#modal');m.innerHTML='<div class="box sh"><div class="frame px"><div class="in px" style="padding:16px;display:flex;flex-direction:column;gap:14px">'+html+'</div></div></div>';m.hidden=false;const f=m.querySelector('input');if(f)setTimeout(()=>f.focus(),50);}
+function askConfirm(msg,yesLabel,onYes){
+  askConfirm.cb=onYes;
+  openModal('<span class="ps" style="font-size:12px;line-height:1.6">'+esc(msg)+'</span><div class="grid2" style="gap:12px"><div class="frame thin px"><button type="button" class="px addrow ps" data-act="closemodal">CANCEL</button></div><div class="frame thin px"><button type="button" class="px addrow ps" data-act="confirmyes" style="background:var(--btn);color:var(--bt)">'+yesLabel+'</button></div></div>');
+}
+function closeModal(){const m=$('#modal');m.hidden=true;m.innerHTML='';}
+
+/* ---------------- pages ---------------- */
+const P={};
+
+/* HOME */
+function diaryTotals(){let n=S.diary.flights.length,min=0;S.diary.flights.forEach(f=>min+=flightMin(f));return {n,min};}
+P.home={
+  html(){
+    const tot=diaryTotals();
+    const tile=(id,sub,icon)=>{const pg=PAGES.find(q=>q.id===id),t=THEMES[pg.theme];
+      return '<button type="button" class="tile" data-act="go" data-p="'+id+'" aria-label="Open '+pg.label+'"><div style="filter:drop-shadow(5px 5px 0 '+t.b+')"><div class="px" style="background:'+t.s+';padding:4px"><div class="px" style="background:'+t.bg+';padding:16px 8px;display:flex;flex-direction:column;align-items:center;gap:10px;min-height:126px;justify-content:center">'+icon+
+      '<span class="ps" style="font-size:11px;color:'+t.i+'">'+pg.label+'</span><span class="small" style="color:'+t.s+'">'+sub+'</span></div></div></div></button>';};
+    const th=k=>THEMES[k];
+    return '<div class="sh"><div class="frame px"><div class="in px" style="padding:10px 12px;display:flex;align-items:center;justify-content:space-around">'+
+      '<div class="col g6" style="align-items:center"><span class="ps lbl">ZULU</span><span class="ps" style="font-size:17px" id="hz">--:-- Z</span></div>'+
+      '<svg style="width:6px;height:36px;shape-rendering:crispEdges" viewBox="0 0 1 6" aria-hidden="true">'+rect(0,0,'#E6C9DA')+rect(0,2,'#E6C9DA')+rect(0,4,'#E6C9DA')+'</svg>'+
+      '<div class="col g6" style="align-items:center"><span class="ps lbl">LOCAL</span><span class="ps" style="font-size:17px" id="hl">--:--</span></div></div></div></div>'+
+      '<div class="grid2" style="gap:12px">'+statBox('peri','TOTAL FLIGHTS',tot.n)+statBox('peri','TOTAL HOURS',fmtDur(tot.min))+'</div>'+
+      '<div class="grid2">'+
+        tile('calc','add up hours',gridSvg(ICONS.calc,th('pink').s,4))+
+        tile('clock','what time will it be',clockSvg(10,10,42))+
+        tile('timer','out off on in',gridSvg(ICONS.timer,th('peach').s,4))+
+        tile('sdt','speed dist time',gridSvg(ICONS.sdt,th('mint').s,4))+
+        tile('diary','your flying days',gridSvg(ICONS.diary,th('peri').s,5))+
+        tile('todo','tick it off',gridSvg(ICONS.todo,th('butter').s,5))+
+      '</div>'+
+      '<div class="grid2" style="gap:12px;margin-top:6px">'+
+        '<div class="frame thin px"><button type="button" class="px addrow ps" data-act="backup" style="background:#fff">BACKUP</button></div>'+
+        '<div class="frame thin px"><button type="button" class="px addrow ps" data-act="restore" style="background:#fff">RESTORE</button></div></div>'+
+      '<div class="small center muted" style="text-align:center">last backup: '+(S.lastBackup?esc(S.lastBackup):'never')+'</div>';
+  },
+  tick(){
+    const now=new Date(),z=partsIn(now,'UTC');const el=$('#hz'),el2=$('#hl');
+    if(el)el.textContent=fmtHM(z.h,z.m)+' Z';
+    if(el2)el2.textContent=fmtHM(now.getHours(),now.getMinutes());
+  }
+};
+function statBox(theme,label,val){const t=THEMES[theme];return '<div class="px" style="background:'+t.s+';padding:3px"><div class="px" style="background:'+t.l+';padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:8px;color:'+t.i+'"><span class="ps" style="font-size:8px">'+label+'</span><span class="ps" style="font-size:17px">'+val+'</span></div></div>';}
+
+/* TIME CALC */
+P.calc={
+  html(){
+    return '<div class="sh sticky"><div class="frame px"><div class="in px screen"><span class="ps lbl">TOTAL</span><span class="ps big" id="ctot"></span><span class="sub" id="cexp"></span></div></div></div>'+
+      '<div class="rows">'+rowsHtml(S.calc.rows)+'</div>'+bigBtn('CLEAR ALL','clearcalc');
+  },
+  update(){
+    const t=rowsTotal(S.calc.rows),el=$('#ctot');
+    el.textContent=fmtDur(t);el.classList.toggle('neg',t<0);
+    $('#cexp').textContent=rowsExpr(S.calc.rows);
+  }
+};
+
+/* CLOCK CALC */
+function clockStart(){const c=S.clock;if(c.sh===''&&c.sm==='')return null;const h=num(c.sh),m=num(c.sm);if(h>23||m>59)return NaN;return h*60+m;}
+P.clock={
+  html(){
+    const c=S.clock;
+    return '<div class="center g14" style="flex-wrap:wrap">'+fmtSeg()+zoneSeg(c.zulu)+'</div>'+
+      '<div class="row g14" style="align-items:stretch">'+
+        '<div class="sh" style="flex:1;min-width:0"><div class="frame px" style="height:100%"><div class="in px screen" style="height:100%;justify-content:center;padding:14px 6px"><span class="ps lbl" id="klab"></span><span class="ps" style="font-size:24px;white-space:nowrap" id="kend"></span><span class="tag ps hidden" id="kday"></span><span class="sub" id="kexp" style="font-size:19px"></span></div></div></div>'+
+        '<div class="sh" style="display:flex;align-items:center" id="kclock"></div></div>'+
+      '<div class="frame thin px"><div class="in white px rowin" style="padding:8px 10px">'+
+        '<span class="ps lbl" style="flex:1">START</span>'+
+        '<div class="fld pxs"><input class="pxs" inputmode="numeric" autocomplete="off" placeholder="HH" maxlength="2" aria-label="Start hour" data-in="sh" value="'+esc(c.sh)+'"></div><span class="ps" style="font-size:16px">:</span>'+
+        '<div class="fld pxs"><input class="pxs" inputmode="numeric" autocomplete="off" placeholder="MM" maxlength="2" aria-label="Start minute" data-in="sm" value="'+esc(c.sm)+'"></div>'+
+        '<div class="frame thin pxs" style="margin-left:4px"><button type="button" class="pxs ps" data-act="now" style="width:58px;height:38px;border:0;background:var(--btn);color:var(--bt);font-size:9px;padding:0">NOW</button></div>'+
+      '</div></div>'+
+      '<div class="rows">'+rowsHtml(c.rows)+'</div>'+bigBtn('CLEAR ALL','clearclock');
+  },
+  update(){
+    const c=S.clock,st=clockStart(),z=c.zulu?' Z':'';
+    $('#klab').textContent='END TIME · '+(c.zulu?'ZULU':'LOCAL');
+    const day=$('#kday');
+    if(st==null||isNaN(st)){
+      $('#kend').textContent='--:--'+z;day.classList.add('hidden');
+      $('#kexp').textContent=st==null?'enter a start time':'check start time';
+      $('#kclock').innerHTML=clockSvg(null,0,104);return;
+    }
+    const total=st+rowsTotal(c.rows),days=Math.floor(total/1440),end=((total%1440)+1440)%1440,h=Math.floor(end/60),m=end%60;
+    $('#kend').textContent=fmtHM(h,m)+z;
+    if(days){day.textContent=(days>0?'+':MINUS)+Math.abs(days)+(Math.abs(days)>1?' DAYS':' DAY');day.classList.remove('hidden');}else day.classList.add('hidden');
+    $('#kexp').textContent=rowsExpr(c.rows,fmtHM(Math.floor(st/60),st%60)+z);
+    $('#kclock').innerHTML=clockSvg(h,m,104);
+  }
+};
+
+/* FLIGHT TIMER */
+const EV=[['out','OUT','engine start'],['off','OFF','wheels up'],['on','ON','wheels down'],['in','IN','parked']];
+function evParts(ms,zulu){const d=new Date(ms);return zulu?{y:d.getUTCFullYear(),mo:d.getUTCMonth(),d:d.getUTCDate(),h:d.getUTCHours(),m:d.getUTCMinutes()}:{y:d.getFullYear(),mo:d.getMonth(),d:d.getDate(),h:d.getHours(),m:d.getMinutes()};}
+function evMs(y,mo,d,h,m,zulu){return zulu?Date.UTC(y,mo,d,h,m):new Date(y,mo,d,h,m).getTime();}
+function durMin(a,b){if(a==null||b==null)return null;let d=Math.round((b-a)/60000);while(d<0)d+=1440;return d;}
+P.timer={
+  html(){
+    const t=S.timer,z=t.zulu;
+    const rows=EV.map(([k,lab,hint])=>{const ms=t.ev[k],done=ms!=null,p=done?evParts(ms,z):null;
+      const sub=done&&!S.fmt24?fmtHM(p.h,p.m):hint;
+      return '<div class="frame thin px"><div class="in white px rowin" style="padding:8px 10px;gap:8px">'+
+        '<div style="filter:drop-shadow(3px 3px 0 var(--b));flex:none"><div class="pxs" style="background:var(--i);padding:3px"><button type="button" class="pxs tapb'+(done?' done':'')+'" aria-pressed="'+done+'" data-act="tap" data-k="'+k+'"><span class="ps row g8" style="font-size:15px">'+lab+(done?TICK('#FFFFFF'):'')+'</span><span class="hint">'+sub+'</span></button></div></div>'+
+        '<div class="row" style="margin-left:auto;gap:4px"><div class="fld pxs" style="flex-basis:50px"><input class="pxs" inputmode="numeric" autocomplete="off" maxlength="2" placeholder="--" aria-label="'+lab+' hour" data-in="th" data-k="'+k+'" value="'+(done?pad2(p.h):'')+'"></div><span class="ps" style="font-size:13px">:</span>'+
+        '<div class="fld pxs" style="flex-basis:50px"><input class="pxs" inputmode="numeric" autocomplete="off" maxlength="2" placeholder="--" aria-label="'+lab+' minute" data-in="tm" data-k="'+k+'" value="'+(done?pad2(p.m):'')+'"></div>'+
+        '<span class="ps" style="font-size:11px;width:14px">'+(z?'Z':'L')+'</span></div></div></div>';}).join('');
+    const box=(id,label)=>'<div class="frame px"><div class="in px screen" style="padding:12px 6px"><span class="ps" style="font-size:9px;color:var(--s)">'+label+'</span><span class="ps" style="font-size:19px" id="'+id+'"></span><span class="small muted" id="'+id+'s"></span></div></div>';
+    const saved=t.savedId&&S.diary.flights.some(f=>f.id===t.savedId);
+    return '<div class="center g14" style="flex-wrap:wrap">'+fmtSeg()+zoneSeg(z)+'</div><div class="col g10">'+rows+'</div>'+
+      '<div class="grid2">'+box('tblock','BLOCK TIME')+box('tflight','FLIGHT TIME')+'</div>'+
+      '<div class="row g14" style="margin-top:4px">'+
+        '<div style="flex:1;filter:drop-shadow(5px 5px 0 #262E6B)"><div class="px" style="background:#262E6B;padding:4px"><button type="button" class="px bigbtn ps" id="tsave" data-act="tsave" style="background:#C7CCFF;color:#161C4A;font-size:11px;line-height:1.6">'+(saved?'SAVED<br>TO DIARY':'SAVE TO<br>DIARY')+'</button></div></div>'+
+        '<div style="flex:1">'+bigBtn('RESET','treset').replace('font-size:16px','')+'</div></div>';
+  },
+  update(){
+    const e=S.timer.ev;
+    const b=durMin(e.out,e.in),f=durMin(e.off,e.on);
+    $('#tblock').textContent=b==null?'-h --m':fmtDur(b);$('#tblocks').textContent=b==null?'tap OUT + IN':'OUT → IN';
+    $('#tflight').textContent=f==null?'-h --m':fmtDur(f);$('#tflights').textContent=f==null?'tap OFF + ON':'OFF → ON';
+  }
+};
+
+/* SDT */
+function sdtCalc(){
+  const s=S.sdt,gs=num(s.gs),dist=num(s.dist),tmin=num(s.th)*60+num(s.tm);
+  if(s.solve==='time'){if(s.gs===''||s.dist===''||gs<=0)return null;const m=dist/gs*60;return {label:'TIME EN ROUTE',val:fmtDur(m),sub:trimNum(dist)+' NM at '+trimNum(gs)+' KT',sub2:m.toFixed(1)+' min',raw:m};}
+  if(s.solve==='dist'){if(s.gs===''||(s.th===''&&s.tm==='')||gs<0)return null;const d=gs*tmin/60;return {label:'DISTANCE',val:trimNum(d)+' NM',sub:trimNum(gs)+' KT for '+fmtDur(tmin),sub2:'',raw:d};}
+  if(s.dist===''||(s.th===''&&s.tm==='')||tmin<=0)return null;const g=dist/(tmin/60);return {label:'GROUNDSPEED',val:trimNum(g)+' KT',sub:trimNum(dist)+' NM in '+fmtDur(tmin),sub2:'',raw:g};
+}
+function trimNum(n){const r=Math.round(n*10)/10;return Number.isInteger(r)?String(r):r.toFixed(1);}
+P.sdt={
+  html(){
+    const s=S.sdt;
+    const field=(lab,key,unit,val,mode)=>'<div class="row g8"><span class="ps lbl" style="flex:1">'+lab+'</span><div class="fld wide pxs"><input class="pxs" inputmode="'+(mode||'decimal')+'" autocomplete="off" placeholder="0" aria-label="'+lab+'" data-in="sdt" data-k="'+key+'" value="'+esc(val)+'"></div><span class="u" style="width:36px">'+unit+'</span></div>';
+    const timeField='<div class="row g8"><span class="ps lbl" style="flex:1">TIME</span><div class="fld pxs" style="flex-basis:50px"><input class="pxs" inputmode="numeric" autocomplete="off" placeholder="0" aria-label="Time hours" data-in="sdt" data-k="th" value="'+esc(s.th)+'"></div><span class="u">h</span><div class="fld pxs" style="flex-basis:50px"><input class="pxs" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="Time minutes" data-in="sdt" data-k="tm" value="'+esc(s.tm)+'"></div><span class="u">m</span></div>';
+    const fields=s.solve==='time'?field('GROUNDSPEED','gs','KT',s.gs)+field('DISTANCE','dist','NM',s.dist):
+                s.solve==='dist'?field('GROUNDSPEED','gs','KT',s.gs)+timeField:field('DISTANCE','dist','NM',s.dist)+timeField;
+    return '<div class="center g10" style="align-items:center"><span class="ps" style="font-size:9px;color:var(--s)">SOLVE</span>'+seg([['TIME','time',s.solve==='time'],['DIST','dist',s.solve==='dist'],['GS','gs',s.solve==='gs']],'solve').replace(/class="sg ps/g,'style="min-width:76px" class="sg ps')+'</div>'+
+      '<div class="sh"><div class="frame px"><div class="in px screen"><span class="ps lbl" id="slab"></span><span class="ps big" id="sval"></span><span class="sub" id="ssub"></span><span class="small muted" id="ssub2"></span></div></div></div>'+
+      '<div class="frame thin px"><div class="in white px col g10" style="padding:12px">'+fields+'</div></div>'+bigBtn('CLEAR ALL','clearsdt');
+  },
+  update(){
+    const r=sdtCalc(),lab={time:'TIME EN ROUTE',dist:'DISTANCE',gs:'GROUNDSPEED'}[S.sdt.solve];
+    $('#slab').textContent=lab;$('#sval').textContent=r?r.val:'--';
+    $('#ssub').textContent=r?r.sub:'fill in the boxes below';$('#ssub2').textContent=r?r.sub2:'';
+  }
+};
+
+/* DIARY */
+function flightMin(f){return f.flight!=null?f.flight:(f.block!=null?f.block:0);}
+function curMonth(){if(!S.diary.month){const n=new Date();S.diary.month=n.getFullYear()+'-'+pad2(n.getMonth()+1);}return S.diary.month;}
+P.diary={
+  html(){
+    const [y,mo]=curMonth().split('-').map(Number);
+    const today=localYMD(new Date());if(!S.diary.sel)S.diary.sel=today;
+    const sel=S.diary.sel;
+    const inMonth=S.diary.flights.filter(f=>f.date.startsWith(y+'-'+pad2(mo)));
+    const mMin=inMonth.reduce((a,f)=>a+flightMin(f),0);
+    const flown=new Set(inMonth.map(f=>f.date));
+    const first=new Date(y,mo-1,1).getDay(),dim=new Date(y,mo,0).getDate();
+    let cells='SMTWTFS'.split('').map(d=>'<span class="ps wd">'+d+'</span>').join('')+'<span></span>'.repeat(first);
+    for(let d=1;d<=dim;d++){const ds=ymd(y,mo,d),f=flown.has(ds),isSel=ds===sel;
+      const star=f?'<svg viewBox="0 0 5 5" aria-hidden="true" style="color:'+(isSel?'#FFFFFF':'var(--s)')+'">'+rect(2,0,'currentColor',1,5)+rect(0,2,'currentColor',5,1)+'</svg>':'';
+      cells+='<button type="button" class="pxs day'+(f?' flown':'')+(isSel?' sel':'')+(ds===today?' today':'')+'" data-act="day" data-d="'+ds+'" aria-label="'+d+' '+MONTHS_LONG[mo-1]+(f?', flight logged':'')+'">'+d+star+'</button>';}
+    const dayFlights=S.diary.flights.filter(f=>f.date===sel).sort((a,b)=>(a.off||a.out||'').localeCompare(b.off||b.out||''));
+    const sp=parseYMD(sel);
+    let detail='<div class="row" style="justify-content:space-between"><span class="ps" style="font-size:11px">'+wdOf(sel)+' '+pad2(sp.d)+' '+MONTHS[sp.m-1]+' '+sp.y+'</span><span class="ps" style="font-size:9px;color:var(--s)">LOCAL</span></div>';
+    if(!dayFlights.length)detail+='<div class="list-sep small muted" style="padding-top:8px">no flights logged this day</div>';
+    dayFlights.forEach(f=>{
+      const main=f.off&&f.on?f.off+' → '+f.on:(f.out&&f.in?f.out+' → '+f.in:'');
+      detail+='<div class="list-sep col g6" style="padding-top:8px"><div class="row" style="justify-content:space-between;gap:8px"><span style="font-size:24px">'+main+'</span><span class="ps" style="font-size:13px">'+fmtDur(flightMin(f))+'</span>'+
+        '<button type="button" class="xbtn ps" aria-label="Delete flight" data-act="delflight" data-id="'+f.id+'">x</button></div>'+
+        (f.out&&f.in&&f.flight!=null?'<span class="small muted">block '+f.out+' → '+f.in+' · '+fmtDur(f.block)+'</span>':(f.flight==null?'<span class="small muted">block time</span>':''))+'</div>';
+    });
+    const tot=diaryTotals();
+    return '<div class="row" style="justify-content:space-between">'+
+        '<button type="button" class="sg ps" style="font-size:14px;width:44px;padding:0" aria-label="Previous month" data-act="month" data-v="-1">&lt;</button>'+
+        '<button type="button" class="col g6" style="align-items:center;border:0;background:transparent;padding:0" data-act="thismonth" aria-label="Go to this month"><span class="ps" style="font-size:13px">'+MONTHS[mo-1]+' '+y+'</span><span class="sub">'+inMonth.length+' flight'+(inMonth.length===1?'':'s')+' · '+fmtDur(mMin)+'</span></button>'+
+        '<button type="button" class="sg ps" style="font-size:14px;width:44px;padding:0" aria-label="Next month" data-act="month" data-v="1">&gt;</button></div>'+
+      '<div class="sh"><div class="frame px"><div class="in px" style="padding:10px 8px"><div class="cal">'+cells+'</div></div></div></div>'+
+      '<div class="frame thin px"><div class="in white px col g8" style="padding:12px 14px">'+detail+'</div></div>'+
+      '<div class="grid2" style="gap:12px">'+statBox('peri','ALL-TIME FLIGHTS',tot.n)+statBox('peri','ALL-TIME HOURS',fmtDur(tot.min))+'</div>'+
+      bigBtn('+ LOG FLIGHT','logflight');
+  }
+};
+function flightForm(date){
+  const f=(id,lab)=>'<div class="row g8"><span class="ps lbl" style="flex:1">'+lab+'</span><div class="fld wide pxs"><input class="pxs" id="'+id+'" inputmode="numeric" autocomplete="off" placeholder="HH:MM" maxlength="5"></div></div>';
+  openModal('<span class="ps" style="font-size:12px">LOG A FLIGHT</span>'+
+    '<div class="row g8"><span class="ps lbl" style="flex:1">DATE</span><div class="fld pxs" style="flex-basis:180px"><input class="pxs" type="date" id="ff_date" value="'+date+'" style="font-size:22px"></div></div>'+
+    '<span class="small muted">local times, 24h. fill OFF + ON for flight time, OUT + IN for block time.</span>'+
+    f('ff_out','OUT')+f('ff_off','OFF')+f('ff_on','ON')+f('ff_in','IN')+
+    '<span class="small" id="ff_err" style="color:var(--neg)"></span>'+
+    '<div class="grid2" style="gap:12px"><div class="frame thin px"><button type="button" class="px addrow ps" data-act="closemodal">CANCEL</button></div><div class="frame thin px"><button type="button" class="px addrow ps" data-act="saveflight" style="background:var(--btn);color:var(--bt)">SAVE</button></div></div>');
+}
+function makeFlight(date,out,off,on,inn,id){
+  const mins=[out,off,on,inn].map(hmToMin);
+  const d=(a,b)=>a==null||b==null?null:((b-a)%1440+1440)%1440;
+  return {id:id||uid(),date,out:out?minToHM(mins[0]):null,off:off?minToHM(mins[1]):null,on:on?minToHM(mins[2]):null,in:inn?minToHM(mins[3]):null,block:d(mins[0],mins[3]),flight:d(mins[1],mins[2])};
+}
+
+/* TODO */
+function dueLabel(s){const p=parseYMD(s);return wdOf(s)+' '+pad2(p.d)+' '+MONTHS[p.m-1];}
+P.todo={
+  html(){
+    const items=S.todo.items,today=localYMD(new Date());
+    const list=items.map((it,i)=>{
+      const tag=it.due?'<span class="tag ps'+(!it.done&&it.due<today?' over':'')+'">'+dueLabel(it.due)+'</span>':CAL_ICON('var(--s)');
+      return '<div class="row g10'+(i?' list-sep':'')+'" style="padding:8px 0">'+
+        '<div class="pxs" style="background:var(--s);padding:3px;flex:none"><button type="button" class="pxs cb'+(it.done?' on':'')+'" role="checkbox" aria-checked="'+!!it.done+'" aria-label="'+esc(it.text)+'" data-act="tick" data-i="'+i+'">'+(it.done?TICK(THEMES.butter.i):'')+'</button></div>'+
+        '<span style="flex:1;min-width:0;overflow-wrap:anywhere;font-size:23px" class="'+(it.done?'done-t':'')+'">'+esc(it.text)+'</span>'+
+        '<label class="duebtn" aria-label="Due date">'+tag+'<input type="date" data-in="due" data-i="'+i+'" value="'+(it.due||'')+'"></label>'+
+        '<button type="button" class="xbtn ps" aria-label="Delete task" data-act="deltask" data-i="'+i+'">x</button></div>';}).join('');
+    const left=items.filter(x=>!x.done).length,done=items.length-left;
+    return '<div class="row g10"><div class="frame thin px" style="flex:1"><input class="px txt" id="newtask" placeholder="add a task..." aria-label="New task" enterkeyhint="done" maxlength="120"></div>'+
+      '<div style="filter:drop-shadow(3px 3px 0 var(--b))"><div class="frame thin px"><button type="button" class="px ps" data-act="addtask" aria-label="Add task" style="width:52px;height:46px;border:0;background:var(--l);font-size:18px;padding:0">+</button></div></div></div>'+
+      (items.length?'<div class="frame thin px"><div class="in white px col" style="padding:6px 12px">'+list+'</div></div>':'<div class="center sub" style="text-align:center">nothing yet. add your first task!</div>')+
+      '<div class="center sub">'+left+' to go · '+done+' done</div>'+bigBtn('CLEAR DONE','cleardone');
+  }
+};
+
+/* ZULU */
+P.zulu={
+  html(){
+    const card=(id,bg)=>'<div class="sh"><div class="frame px"><div class="in px screen" style="background:'+bg+';padding:16px"><span class="ps lbl" id="'+id+'l"></span><span class="ps" style="font-size:36px;line-height:1.2;white-space:nowrap" id="'+id+'t"></span><span class="sub" id="'+id+'d"></span></div></div></div>';
+    const zones=S.zones.map((c,i)=>'<div class="row g10'+(i?' list-sep':'')+'" style="padding:8px 0"><span class="pxs ps chip">'+c+'</span><span class="col" style="flex:1;min-width:0"><span class="small muted">'+esc(IATA[c]?IATA[c][0]:c)+'</span><span class="small muted" id="zo'+i+'"></span></span><span class="ps" style="font-size:16px;white-space:nowrap" id="zt'+i+'"></span><button type="button" class="xbtn ps" style="width:30px" aria-label="Remove '+c+'" data-act="delzone" data-i="'+i+'">x</button></div>').join('');
+    return '<div class="center">'+fmtSeg()+'</div>'+card('zz','var(--f)')+card('zl','#F1E8FF')+
+      '<div class="frame thin px"><div class="in white px col" style="padding:6px 12px">'+zones+
+      '<button type="button" class="ps" data-act="addzone" style="margin:8px 0 6px;height:44px;border:3px dashed var(--b);background:#F1E8FF;color:var(--s);font-size:11px">+ ADD ZONE</button></div></div>';
+  },
+  tick(){
+    const now=new Date();
+    const z=partsIn(now,'UTC');
+    $('#zzl').textContent='ZULU · UTC';$('#zzt').textContent=fmtHM(z.h,z.m)+' Z';$('#zzd').textContent=dateLabel(z);
+    const l=partsIn(now,LOCAL_TZ);
+    $('#zll').textContent='LOCAL · '+fmtOffset(offsetMin(now,LOCAL_TZ));$('#zlt').textContent=fmtHM(l.h,l.m);$('#zld').textContent=dateLabel(l);
+    S.zones.forEach((c,i)=>{const tz=IATA[c]&&IATA[c][1];if(!tz)return;const p=partsIn(now,tz);
+      const dd=Math.round((Date.UTC(p.y,p.mo-1,p.d)-Date.UTC(l.y,l.mo-1,l.d))/864e5);
+      const ot=$('#zo'+i),tt=$('#zt'+i);if(!ot)return;
+      ot.textContent=fmtOffset(offsetMin(now,tz))+(dd?(dd>0?' · +':' · '+MINUS)+Math.abs(dd)+'d':'');tt.textContent=fmtHM(p.h,p.m);});
+  }
+};
+function zoneModal(){
+  openModal('<span class="ps" style="font-size:12px">ADD A ZONE</span><span class="small muted">type an IATA airport code, like MNL or KIX</span>'+
+    '<div class="frame thin px"><input class="px txt ps" id="zcode" maxlength="3" autocomplete="off" autocapitalize="characters" placeholder="MNL" style="font-size:18px;text-transform:uppercase" data-in="zcode"></div>'+
+    '<div class="col" id="zsug" style="max-height:240px;overflow:auto"></div><span class="small" id="zerr" style="color:var(--neg)"></span>'+
+    '<div class="grid2" style="gap:12px"><div class="frame thin px"><button type="button" class="px addrow ps" data-act="closemodal">CANCEL</button></div><div class="frame thin px"><button type="button" class="px addrow ps" data-act="savezone" style="background:var(--btn);color:var(--bt)">ADD</button></div></div>');
+  zoneSuggest('');
+}
+function zoneSuggest(q){
+  q=q.toUpperCase();const out=[];
+  for(const c in IATA){if(!q||c.startsWith(q)||IATA[c][0].toUpperCase().startsWith(q))out.push(c);if(out.length>=12)break;}
+  $('#zsug').innerHTML=out.map(c=>'<button type="button" class="row g10" data-act="pickzone" data-c="'+c+'" style="border:0;background:transparent;padding:8px 2px;text-align:left"><span class="pxs ps chip">'+c+'</span><span class="small">'+esc(IATA[c][0])+'</span></button>').join('');
+}
+
+/* ---------------- router ---------------- */
+function curPage(){const id=(location.hash||'#home').slice(1);return PAGES.find(p=>p.id===id)||PAGES[0];}
+function render(){
+  const p=curPage();applyTheme(p.theme);
+  $('#app').innerHTML=header(p)+P[p.id].html();
+  if(P[p.id].update)P[p.id].update();
+  if(P[p.id].tick)P[p.id].tick();
+}
+function rerender(){const y=window.scrollY;render();window.scrollTo(0,y);}
+window.addEventListener('hashchange',()=>{menuOpen=false;closeModal();render();window.scrollTo(0,0);});
+setInterval(()=>{const p=curPage();if(P[p.id].tick)P[p.id].tick();},1000);
+
+/* ---------------- events ---------------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');
+  if(menuOpen&&(!b||(b.dataset.act!=='menu'&&b.dataset.act!=='go'))){menuOpen=false;rerender();if(!b)return;}
+  if(!b)return;
+  const a=b.dataset.act,i=+b.dataset.i,pg=curPage().id;
+  const rowsOf=()=>pg==='calc'?S.calc.rows:S.clock.rows;
+  switch(a){
+    case 'menu':menuOpen=!menuOpen;rerender();return;
+    case 'go':menuOpen=false;if(location.hash==='#'+b.dataset.p)render();else location.hash=b.dataset.p;return;
+    case 'fmt':S.fmt24=b.dataset.v==='24';break;
+    case 'zmode':if(pg==='clock')S.clock.zulu=b.dataset.v==='Z';else S.timer.zulu=b.dataset.v==='Z';break;
+    case 'sign':rowsOf()[i].s=+b.dataset.v;break;
+    case 'addrow':rowsOf().push(newRow());save();rerender();{const ins=document.querySelectorAll('[data-in="rh"]');if(ins.length)ins[ins.length-1].focus();}return;
+    case 'delrow':{const r=rowsOf();if(r.length>1)r.splice(i,1);else r[0]=newRow();break;}
+    case 'clearcalc':S.calc.rows=[newRow()];break;
+    case 'clearclock':S.clock.rows=[newRow()];S.clock.sh='';S.clock.sm='';break;
+    case 'now':{const n=new Date(),p=S.clock.zulu?partsIn(n,'UTC'):{h:n.getHours(),m:n.getMinutes()};S.clock.sh=pad2(p.h);S.clock.sm=pad2(p.m);break;}
+    case 'tap':{const k=b.dataset.k,t=S.timer,stamp=()=>{t.ev[k]=Math.floor(Date.now()/60000)*60000;};if(t.ev[k]!=null){askConfirm('RE-STAMP '+k.toUpperCase()+' WITH THE TIME NOW?','RE-STAMP',stamp);return;}stamp();break;}
+    case 'tsave':{const e=S.timer.ev;if(!((e.out!=null&&e.in!=null)||(e.off!=null&&e.on!=null))){toast('needs OUT + IN or OFF + ON');return;}
+      const L=ms=>{if(ms==null)return null;const d=new Date(ms);return pad2(d.getHours())+':'+pad2(d.getMinutes());};
+      const first=e.out!=null?e.out:e.off;
+      const f={id:S.timer.savedId||uid(),date:localYMD(new Date(first)),out:L(e.out),off:L(e.off),on:L(e.on),in:L(e.in),block:durMin(e.out,e.in),flight:durMin(e.off,e.on)};
+      const idx=S.diary.flights.findIndex(x=>x.id===f.id);if(idx>=0)S.diary.flights[idx]=f;else S.diary.flights.push(f);
+      S.timer.savedId=f.id;S.diary.sel=f.date;S.diary.month=f.date.slice(0,7);save();rerender();toast(idx>=0?'diary entry updated':'saved to diary!');return;}
+    case 'treset':{const e=S.timer.ev,go=()=>{S.timer.ev={out:null,off:null,on:null,in:null};S.timer.savedId=null;};if(e.out||e.off||e.on||e.in){askConfirm('RESET THE FLIGHT TIMER?','RESET',go);return;}go();break;}
+    case 'solve':S.sdt.solve=b.dataset.v;break;
+    case 'clearsdt':S.sdt.gs='';S.sdt.dist='';S.sdt.th='';S.sdt.tm='';break;
+    case 'month':{let [y,m]=curMonth().split('-').map(Number);m+=+b.dataset.v;if(m<1){m=12;y--;}if(m>12){m=1;y++;}S.diary.month=y+'-'+pad2(m);break;}
+    case 'thismonth':{const n=new Date();S.diary.month=n.getFullYear()+'-'+pad2(n.getMonth()+1);S.diary.sel=localYMD(n);break;}
+    case 'day':S.diary.sel=b.dataset.d;break;
+    case 'delflight':{const id=b.dataset.id;askConfirm('DELETE THIS FLIGHT FROM YOUR DIARY?','DELETE',()=>{S.diary.flights=S.diary.flights.filter(f=>f.id!==id);});return;}
+    case 'logflight':flightForm(S.diary.sel||localYMD(new Date()));return;
+    case 'saveflight':{const g=id=>$('#'+id).value.trim(),date=g('ff_date'),v=['ff_out','ff_off','ff_on','ff_in'].map(g);
+      const err=$('#ff_err');if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){err.textContent='pick a date';return;}
+      for(const x of v)if(x&&hmToMin(x)==null){err.textContent='times look like 09:15 (24h)';return;}
+      if(!((v[1]&&v[2])||(v[0]&&v[3]))){err.textContent='fill OFF + ON, or OUT + IN';return;}
+      S.diary.flights.push(makeFlight(date,...v));S.diary.sel=date;S.diary.month=date.slice(0,7);save();closeModal();rerender();toast('flight logged!');return;}
+    case 'closemodal':closeModal();return;
+    case 'confirmyes':{const cb=askConfirm.cb;askConfirm.cb=null;closeModal();if(cb){cb();save();rerender();}return;}
+    case 'addtask':{const el=$('#newtask'),t=el.value.trim();if(!t){el.focus();return;}S.todo.items.push({id:uid(),text:t,done:false,due:null});save();rerender();$('#newtask').focus();return;}
+    case 'tick':S.todo.items[i].done=!S.todo.items[i].done;break;
+    case 'deltask':S.todo.items.splice(i,1);break;
+    case 'cleardone':if(!S.todo.items.some(x=>x.done))return;S.todo.items=S.todo.items.filter(x=>!x.done);break;
+    case 'addzone':zoneModal();return;
+    case 'pickzone':$('#zcode').value=b.dataset.c;addZone(b.dataset.c);return;
+    case 'savezone':addZone($('#zcode').value);return;
+    case 'delzone':S.zones.splice(i,1);break;
+    case 'backup':doBackup();return;
+    case 'restore':$('#restoreFile').click();return;
+    default:return;
+  }
+  save();rerender();
+});
+function addZone(c){c=(c||'').trim().toUpperCase();
+  if(!IATA[c]){$('#zerr').textContent=c?c+' is not in the list yet':'type a code';return;}
+  if(S.zones.includes(c)){$('#zerr').textContent=c+' is already added';return;}
+  S.zones.push(c);save();closeModal();rerender();}
+document.addEventListener('input',e=>{
+  const el=e.target,k=el.dataset.in;if(!k)return;
+  const i=+el.dataset.i,pg=curPage().id;
+  if(k==='rh'||k==='rm'){el.value=digits(el.value);const r=(pg==='calc'?S.calc.rows:S.clock.rows)[i];r[k==='rh'?'h':'m']=el.value;save();P[pg].update();return;}
+  if(k==='sh'||k==='sm'){el.value=digits(el.value).slice(0,2);S.clock[k]=el.value;save();P.clock.update();return;}
+  if(k==='sdt'){const key=el.dataset.k;el.value=key==='th'?digits(el.value):decimal(el.value);S.sdt[key]=el.value;save();P.sdt.update();return;}
+  if(k==='th'||k==='tm'){el.value=digits(el.value).slice(0,2);timerEdit(el.dataset.k);return;}
+  if(k==='zcode'){el.value=el.value.toUpperCase().replace(/[^A-Z]/g,'');$('#zerr').textContent='';zoneSuggest(el.value);return;}
+});
+document.addEventListener('change',e=>{
+  const el=e.target;
+  if(el.dataset.in==='due'){S.todo.items[+el.dataset.i].due=el.value||null;save();rerender();}
+  if(el.id==='restoreFile'&&el.files&&el.files[0])doRestore(el.files[0]);
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  if(e.target.id==='newtask'){e.preventDefault();document.querySelector('[data-act=addtask]').click();}
+  if(e.target.id==='zcode'){e.preventDefault();addZone(e.target.value);}
+});
+function timerEdit(k){
+  const t=S.timer,z=t.zulu;
+  const hEl=document.querySelector('[data-in=th][data-k='+k+']'),mEl=document.querySelector('[data-in=tm][data-k='+k+']');
+  const hv=hEl.value,mv=mEl.value;
+  if(hv===''&&mv===''){t.ev[k]=null;t.savedId=null;save();P.timer.update();return;}
+  if(hv.length<1||mv.length<2)return;
+  const h=+hv,m=+mv;if(h>23||m>59)return;
+  const order=EV.map(x=>x[0]),idx=order.indexOf(k);
+  let prev=null;for(let j=idx-1;j>=0;j--)if(t.ev[order[j]]!=null){prev=t.ev[order[j]];break;}
+  const base=t.ev[k]!=null?t.ev[k]:(prev!=null?prev:Date.now());
+  const bp=evParts(base,z);let ms=evMs(bp.y,bp.mo,bp.d,h,m,z);
+  if(prev!=null){while(ms<prev)ms+=864e5;while(ms-prev>864e5)ms-=864e5;}
+  t.ev[k]=ms;save();P.timer.update();
+  const btn=document.querySelector('[data-act=tap][data-k='+k+']');
+  if(btn&&!btn.classList.contains('done')){rerender();}
+}
+
+/* ---------------- backup / restore ---------------- */
+function doBackup(){
+  const n=new Date(),name='timecalc-backup-'+localYMD(n)+'.json';
+  S.lastBackup=localYMD(n);save();
+  const blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);
+  rerender();toast('backup saved to downloads');
+}
+function doRestore(file){
+  const r=new FileReader();
+  r.onload=()=>{try{const o=JSON.parse(r.result);if(!o||typeof o!=='object'||!o.diary)throw 0;
+      askConfirm('RESTORE THIS BACKUP? IT REPLACES EVERYTHING IN THE APP NOW.','RESTORE',()=>{S=merge(defaults(),o);setTimeout(()=>toast('backup restored!'),50);});}catch(e){toast('that file is not a backup');}
+    $('#restoreFile').value='';};
+  r.readAsText(file);
+}
+
+/* ---------------- go ---------------- */
+render();
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){try{navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}}
+window.__tc={S:()=>S,sdtCalc,rowsTotal,fmtDur,makeFlight,durMin};
+})();
+</script>
+</body>
+</html>
